@@ -18,7 +18,7 @@ public class RunMe {
         } else {
             builder.command("sh", "-c", "ls");
         }
-        builder.directory(new File("D:\\Repositories\\cli-process-manager\\sample-process\\target"));
+        builder.directory(new File("D:\\Repositories\\git-cli-process-manager\\sample-process\\target"));
         Process process = builder.start();
 
         long pid = process.pid();

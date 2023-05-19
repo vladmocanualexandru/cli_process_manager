@@ -17,7 +17,7 @@ public class RunMe {
 
         String currentTimestamp = sdf.format(new Date());
         String query = String.format(
-                "insert into cli_process_manager.cli_processes (pid, create_date, update_date, status) values(%s,'%s','%s', '%s') on conflict (pid) do update set create_date=excluded.create_date, update_date=excluded.update_date, status=excluded.status",
+                "insert into uc_replication_manager.t_processes (pid, progress, create_date, update_date, status, metadata) values(%s,0, '%s','%s', '%s', 'test') on conflict (pid) do update set create_date=excluded.create_date, update_date=excluded.update_date, status=excluded.status",
                 Long.toString(pid), currentTimestamp, currentTimestamp, Statuses.STARTED);
 
         try (Connection con = db.getConnection()) {
@@ -35,7 +35,7 @@ public class RunMe {
 
         String currentTimestamp = sdf.format(new Date());
         String query = String.format(
-                "update cli_process_manager.cli_processes set update_date='%s', status='%s' where pid = %s",
+                "update uc_replication_manager.t_processes set update_date='%s', status='%s' where pid = %s",
                 currentTimestamp, status.toString(), Long.toString(pid));
 
         try (Connection con = db.getConnection()) {
@@ -53,7 +53,7 @@ public class RunMe {
 
         String currentTimestamp = sdf.format(new Date());
         String query = String.format(
-                "update cli_process_manager.cli_processes set update_date='%s', status='%s', progress=%s where pid = %s",
+                "update uc_replication_manager.t_processes set update_date='%s', status='%s', progress=%s where pid = %s",
                 currentTimestamp, Statuses.RUNNING.toString(), Double.toString(progress), Long.toString(pid));
 
         try (Connection con = db.getConnection()) {
@@ -70,7 +70,7 @@ public class RunMe {
     private static boolean shouldTerminate(long pid) throws SQLException {
 
         try (Connection con = db.getConnection()) {
-            String query = String.format("select status from cli_process_manager.cli_processes where pid = %s", pid);
+            String query = String.format("select status from uc_replication_manager.t_processes where pid = %s", pid);
 
             Statement stmt = con.createStatement();
 
@@ -97,7 +97,11 @@ public class RunMe {
 
         try {
 
-            int steps = 104;
+            int steps = 83;
+
+            if (args.length > 0) {
+                steps = Integer.parseInt(args[0]);
+            }
             for (int count = 1; count <= steps; count++) {
                 System.out.println(Math.random());
                 double progress = 1.0 * count / steps * 100;
